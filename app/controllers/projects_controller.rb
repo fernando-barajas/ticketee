@@ -1,11 +1,11 @@
 class ProjectsController < ApplicationController
+  before_action :find_project, only: [:show, :edit, :update, :destroy]
 
   def index
     @projects = Project.all
   end
 
   def show
-    @project = Project.find(params[:id])
   end
 
   def new
@@ -17,11 +17,29 @@ class ProjectsController < ApplicationController
     
     if @project.save
       flash[:notice] = "Project has been created."
-      redirect_to @project
-    else
-      flash[:alert] = "Project has not been created."
-      render :action => "new"
+      return redirect_to @project
     end
+
+    flash[:alert] = "Project has not been created."
+    render :action => "new"
+  end
+
+  def edit
+  end
+ 
+  def update
+    if @project.update(project_params)
+      flash[:notice] = 'Project has been updated'
+      return redirect_to @project
+    end
+    flash[:notice] = 'Project has not been updated'
+    render action: 'edit'  
+  end
+
+  def destroy
+    @project.destroy
+    flash[:notice] = 'Project has been destroyed'
+    redirect_to projects_path
   end
 
   private
@@ -30,4 +48,7 @@ class ProjectsController < ApplicationController
     params.require(:project).permit(:name, :description)
   end
 
+  def find_project
+    @project = Project.find(params[:id])
+  end
 end
